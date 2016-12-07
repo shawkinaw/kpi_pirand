@@ -35,14 +35,6 @@ int main(int argc, char* argv[])
   // Output Info
   output << "Operating on " << cb.Size() << " clusters." << std::endl << std::endl;
   output << "Iteration, World Size, coordsPerRank, # Samples, Iteration RunTime (Sec), Pi Value" << std::endl;
-  // output << "Iteration, coordsPerRank, # Samples, Host RunTime, Pi Value" << std::endl;
-
-
-  // Randomizes how many increments of the power of 2 to run
-  // srand(time(NULL)); // Seed the time
-  // int max = 31; // 2^30 max power of 2 for int coordsPerRank
-  // int min = 2; // Minimum, do 1 run
-  // int runLimit = rand()%(max-min + 1) + min;
 
   // Run Limit (10 = 1 billion per tdsp)
   int runLimit = 10;
@@ -80,12 +72,8 @@ int main(int argc, char* argv[])
     hc.ReceiveCount(world_size);
 
     // Output Run Info
-    output << i << ", " << world_size[0] << ", " << coordsPerRank << ",  " << double(coordsPerRank)*cb.Size()*8 << ",  "
+    output << i << ", " << (world_size[0]-1) << ", " << coordsPerRank << ",  " << double(coordsPerRank)*cb.Size()*8-1<< ",  "
       << double(std::clock() - begin)/CLOCKS_PER_SEC << ",  " << pi_estimate[0] << std::endl;
-    // output << i << ", " << coordsPerRank << ",  " << double(coordsPerRank)*cb.Size()*8 << ",  "
-    //   << double(std::clock() - begin)/CLOCKS_PER_SEC << ",  " << pi_estimate[0] << std::endl;
-
-
   }
 
   // Write total time it took to run program
