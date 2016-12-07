@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
   // Create a command queue to submit tasks to the complex
   kpi::CommandQueue   cq = ctx.CreateCommandQueue();
 
-  // Allocate a cluster block for the entire complex
+  // Allocate all available clusters within the complex (SDB = 64)
   kpi::ClusterBlock   cb = ctx.AllocClusterBlock();
 
   // Write to an output file
@@ -33,23 +33,31 @@ int main(int argc, char* argv[])
   output.open("example_output.csv");
 
   // Output Info
-  output << "Operating on " << cb.Size() << " clusters." << std::endl;
-  output << "Iteration, coordsPerRank, # Samples,  Time,  Pi Value" << std::endl;
+  output << "Operating on " << cb.Size() << " clusters." << std::endl << std::endl;
+  output << "Iteration, World Size, coordsPerRank, # Samples, Iteration RunTime (Sec), Pi Value" << std::endl;
+  // output << "Iteration, coordsPerRank, # Samples, Host RunTime, Pi Value" << std::endl;
+
 
   // Randomizes how many increments of the power of 2 to run
-  srand(time(NULL)); // Seed the time
-  int max = 31; // 2^30 max power of 2 for int coordsPerRank
-  int min = 2; // Minimum, do 1 run
-  int runLimit = rand()%(max-min + 1) + min;
+  // srand(time(NULL)); // Seed the time
+  // int max = 31; // 2^30 max power of 2 for int coordsPerRank
+  // int min = 2; // Minimum, do 1 run
+  // int runLimit = rand()%(max-min + 1) + min;
+
+  // Run Limit (10 = 1 billion per tdsp)
+  int runLimit = 10;
+
+  // Set first coordsPerRank to 1
+  int coordsPerRank = 1;
 
   // Run in increments of the power of 2
-  for (int i=1;i<runLimit;i+=1)
+  for (int i=1; i<runLimit; i+=1)
   {
     // Get start of each iteration
     std::clock_t begin = std::clock();
 
     // Calculates # of coordinates per rank
-    int coordsPerRank = 1 << i;
+    coordsPerRank *= 10;
 
     // Load a kernel and set the argument to the coordsPerRank
     kpi::KernelWithArgs kwa = ctx.CreateKernelWithArgs("piRandRatio", coordsPerRank);
@@ -68,13 +76,20 @@ int main(int argc, char* argv[])
     std::vector<float> pi_estimate(1);
     hc.ReceiveCount(pi_estimate);
 
+    std::vector<int> world_size(1);
+    hc.ReceiveCount(world_size);
+
     // Output Run Info
-    output << i << ", " << cb.Size() << ", " << coordsPerRank << ",  " << double(coordsPerRank)*cb.Size()*8 << ",  "
+    output << i << ", " << world_size[0] << ", " << coordsPerRank << ",  " << double(coordsPerRank)*cb.Size()*8 << ",  "
       << double(std::clock() - begin)/CLOCKS_PER_SEC << ",  " << pi_estimate[0] << std::endl;
+    // output << i << ", " << coordsPerRank << ",  " << double(coordsPerRank)*cb.Size()*8 << ",  "
+    //   << double(std::clock() - begin)/CLOCKS_PER_SEC << ",  " << pi_estimate[0] << std::endl;
+
+
   }
 
   // Write total time it took to run program
-  output << std::endl << "Total Time: " << double(std::clock() - begin_run)/CLOCKS_PER_SEC << std::endl;
+  output << std::endl << "Total Time (sec): " << double(std::clock() - begin_run)/CLOCKS_PER_SEC << std::endl;
 
   // Close file and exit
   output.close();

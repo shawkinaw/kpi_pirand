@@ -34,7 +34,7 @@ extern "C" __knu_kernel
 void piRandRatio(int coordsPerRank)
 {
     const int RANK       = KPI_Rank();
-    const int WORLD_SIZE = KPI_World_Size();
+    int WORLD_SIZE = KPI_World_Size();
 
     // Each rank needs a different rand seed
     KPI_Srand(0x314159 * RANK, 0x314159 * 2 * RANK, 0x314159 * 3 * RANK);
@@ -85,5 +85,8 @@ void piRandRatio(int coordsPerRank)
 
         // Send result to host
         KPI_Send_Host(&pi, sizeof(pi)/4, 0);
+
+        // Send World Size
+        KPI_Send_Host(&WORLD_SIZE, 1, 0);
     }
 }
