@@ -22,7 +22,7 @@ CPPFLAGS       :=-I$(KNUPATH_INSTALL)/include \
 
 # Compile shared library sources with the position independent code
 # flag
-CXXFLAGS       :=-std=c++11 -fPIC
+CXXFLAGS       :=-std=c++11 -fPIC 
 LDFLAGS        :=-L$(KNUPATH_INSTALL)/lib -Wl,-rpath,$(KNUPATH_INSTALL)/lib -Wl,-rpath,$(shell pwd)
 LDLIBS         :=-lprotobuf -lpthread -lkpirt
 
@@ -37,16 +37,16 @@ clean:
 	rm -rf $(EXE) $(SHLIB) $(EXE_OBJS) $(SHLIB_OBJS) $(TEMPFILES)
 
 %.o : %.knuc
-	$(KNUCC) $(KNUCC_FLAGS) -c -o $@ $<
+	$(KNUCC) $(KNUCC_FLAGS) -c -o $@ $< 
 
 %.o : %.knucpp
-	$(KNUCC) $(KNUCC_FLAGS) -c -o $@ $<
+	$(KNUCC) $(KNUCC_FLAGS) -c -o $@ $< 
 
 %.o : %.knucxx
 	$(KNUCC) $(KNUCC_FLAGS) -c -o $@ $<
 
 $(SHLIB) : $(SHLIB_OBJS)
-	$(CXX) $(LDFLAGS) -shared -o $@ $^ $(LDLIBS)
+	$(CXX) $(LDFLAGS) -shared -o $@ $^ $(LDLIBS) 
 
 $(EXE) : $(EXE_OBJS) $(SHLIB)
-	$(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+	$(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS) 
