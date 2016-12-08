@@ -11,6 +11,9 @@
 
 #include "kpi/kpi_runtime.hpp"
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <fstream>
 #include <ctime>
 
@@ -31,6 +34,8 @@ int main(int argc, char* argv[])
   // Write to an output file
   std::ofstream output;
   output.open("example_output.csv");
+
+  std::cout << "Working directory is: " << getcwd() << std::endl;
 
   // Output Info
   output << "Operating on " << cb.Size() << " clusters." << std::endl << std::endl;
