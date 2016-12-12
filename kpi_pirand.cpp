@@ -35,7 +35,9 @@ int main(int argc, char* argv[])
   std::ofstream output;
   output.open("example_output.csv");
 
-  std::cout << "Working directory is: " << getcwd() << std::endl;
+  char cwd[1024];
+  getcwd(cwd, 1024);
+  std::cout << "Working directory is: " << cwd << std::endl;
 
   // Output Info
   output << "Operating on " << cb.Size() << " clusters." << std::endl << std::endl;
